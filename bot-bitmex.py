@@ -22,8 +22,8 @@ client = bitmex(test=True, api_key=api_key, api_secret=api_secret)
 # Define the trading symbol and time interval
 symbol = 'XBTUSD'
 interval = '1h'
-sma_periodo = 20
-ema_periodo = 21
+sma_period = 20
+ema_period = 21
 
 # Define the order variables
 buyOpen = False
@@ -41,7 +41,7 @@ header = ['Order ID', 'Fecha Open', 'Ticker', 'Order Type', 'Order Size', 'Price
           'Fecha Cierre',
           'Profit/Loss']
 
-# Esta creado o no el csv
+# El csv esta creado o no
 try:
     with open(csv_path, 'r') as f:
         pass
@@ -73,8 +73,8 @@ while True:
         df.set_index('timestamp', inplace=True)
 
         # Define the strategy indicators
-        df['sma'] = talib.SMA(df['close'], sma_periodo)
-        df['ema'] = talib.EMA(df['close'], ema_periodo)
+        df['sma'] = talib.SMA(df['close'], sma_period)
+        df['ema'] = talib.EMA(df['close'], ema_period)
 
         df['bmsb_mayor'] = df['sma'].where(df['sma'] > df['ema'], other=df['ema'])
         df['bmsb_menor'] = df['ema'].where(df['sma'] >= df['ema'], other=df['sma'])
@@ -93,6 +93,7 @@ while True:
         print('Previous BMSB Mayor: ', previous_bmsb_mayor)
         print('Previous BMSB Menor: ', previous_bmsb_menor)
 
+        # Creacion senyales
         if last_close > bmsb_mayor and previous_close < previous_bmsb_menor:
             buySignal = True
             sellSignal = False
@@ -103,6 +104,7 @@ while True:
             buySignal = False
             sellSignal = False
 
+        # Ejecucion a partir de senyales
         if sellSignal and not buyOpen:
             if sellOpen:
                 client.Order.Order_cancelAll(symbol=symbol).result()
