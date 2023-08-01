@@ -4,7 +4,7 @@ import requests
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
+import mplfinance as mpf
 from datetime import datetime
 
 
@@ -45,11 +45,8 @@ with open(csv_file_path, 'w', newline='') as csvfile:
         writer.writerow([candle['timestamp'], candle['open'], candle['high'], candle['low'], candle['close'], candle['volume']])
 
 # Take the data from the csv file
-bitcoin_data = pd.read_csv(csv_file_path)
+bitcoin_data = pd.read_csv(csv_file_path,index_col=0,parse_dates=True)
+bitcoin_data.index.name = 'Date'
 
 # Plot the price
-sns.set_theme()
-plt.figure(figsize=(14,5))
-sns.lineplot(data=bitcoin_data, x="Datetime", y='Close', color='firebrick')
-plt.title("The Price of Bitcoin",size='x-large',color='blue')
-plt.show()
+mpf.plot(bitcoin_data,type='candle',show_nontrading=True,volume=True,style='binance')
